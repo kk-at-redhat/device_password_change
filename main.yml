@@ -1,0 +1,20 @@
+- name: Detect OS
+  ansible.builtin.import_playbook: detect_os.yml
+
+- name: Cisco IOS
+  when: "'ios' in detected_os"
+  ansible.builtin.import_playbook: update_users_ios.yml
+  vars:
+    ansible_network_os: "{{ detected_os | trim }}"
+
+- name: Cisco EOS
+  when: "'aos' in detected_os"
+  ansible.builtin.import_playbook: update_users_eos.yml
+  vars:
+    ansible_network_os: "{{ detected_os | trim }}"
+
+- name: Cisco NXOS
+  when: "'nxos' in detected_os"
+  ansible.builtin.import_playbook: update_users_nxos.yml
+  vars:
+    ansible_network_os: "{{ detected_os | trim }}"

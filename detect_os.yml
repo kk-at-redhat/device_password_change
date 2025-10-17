@@ -1,0 +1,32 @@
+---
+- name: Detect OS by parsing show version
+  hosts: all
+  gather_facts: false
+  connection: ssh
+
+  tasks:
+    - name: Run show version
+      ansible.builtin.raw: show version
+      changed_when: false
+      register: show_version
+
+    - name: Display output
+      debug:
+        var: show_version.stdout
+
+    - name: Parse OS from show version
+      ansible.builtin.set_fact:
+        detected_os: >
+          {% if 'IOS' in show_version.stdout %}
+            cisco.ios.ios
+          {% elif 'NX-OS' in show_version.stdout %}
+            cisco.nxos.nxos
+          {% elif 'Arista' in show_version.stdout %}
+            arista.eos.eos
+          {% else %}
+            unknown
+          {% endif %}
+
+    - name: Print detected OS
+      debug:
+        msg: "Host {{ inventory_hostname }} is running {{ detected_os | trim }}"

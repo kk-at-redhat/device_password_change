@@ -1,0 +1,24 @@
+---
+- name: Update usernames on Cisco IOS devices
+  hosts: all
+  gather_facts: false
+  connection: network_cli
+
+  tasks:
+    - name: Remove old username (IOS)
+      when: change_username | default(false)
+      cisco.ios.ios_user:
+        name: "{{ current_username }}"
+        state: absent
+
+    - name: Add new username (IOS)
+      cisco.ios.ios_user:
+        name: "{{ new_username }}"
+        privilege: 15
+        configured_password: "{{ new_password }}"
+
+    - name: Set enable secret (IOS)
+      cisco.ios.ios_config:
+        lines:
+          - "enable secret {{ enable_password }}"
+        save_when: "changed"

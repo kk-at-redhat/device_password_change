@@ -1,0 +1,24 @@
+---
+- name: Update usernames on Cisco NXOS devices
+  hosts: all
+  gather_facts: false
+  connection: network_cli
+
+  tasks:
+    - name: Remove old username (NXOS)
+      when: change_username | default(false)
+      cisco.nxos.nxos_user:
+        name: "{{ current_username }}"
+        state: absent
+
+    - name: Add new username (NXOS)
+      cisco.nxos.nxos_user:
+        name: "{{ new_username }}"
+        roles: ["network-admin"]
+        configured_password: "{{ new_password }}"
+
+    - name: Set enable password (not commonly used in NXOS)
+      cisco.nxos.nxos_config:
+        lines:
+          - "password strength-check disable"
+          - "username {{ new_username }} password {{ enable_password }}"
