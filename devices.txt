@@ -1,2 +1,5 @@
 # IOS XE Software, Version 17.12.02
 10.10.20.48
+
+# NX-OS Software, Version 10.3(3)
+sbx-nxos-mgmt.cisco.com
