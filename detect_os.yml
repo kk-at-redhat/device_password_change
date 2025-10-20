@@ -9,24 +9,23 @@
       ansible.builtin.raw: show version
       changed_when: false
       register: show_version
-
-    - name: Display output
-      debug:
-        var: show_version.stdout
+      check_mode: false
+      ignore_errors: true
 
     - name: Parse OS from show version
       ansible.builtin.set_fact:
         detected_os: >
-          {% if 'IOS' in show_version.stdout %}
-            cisco.ios.ios
-          {% elif 'NX-OS' in show_version.stdout %}
+          {% if 'NX-OS' in show_version.stdout %}
             cisco.nxos.nxos
           {% elif 'Arista' in show_version.stdout %}
             arista.eos.eos
+          {% elif 'IOS' in show_version.stdout %}
+            cisco.ios.ios
           {% else %}
             unknown
           {% endif %}
 
-    - name: Print detected OS
-      debug:
-        msg: "Host {{ inventory_hostname }} is running {{ detected_os | trim }}"
+    - name: Fail if unable to determine OS
+      when: detected_os | trim == 'unknown'
+      ansible.builtin.fail:
+        msg: "Unable to determine device OS."
