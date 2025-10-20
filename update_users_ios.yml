@@ -16,9 +16,14 @@
         name: "{{ new_username }}"
         privilege: 15
         configured_password: "{{ new_password }}"
+#        hashed_password:
+#          type: 8
+#          value: "{{ new_password_hash }}"
 
     - name: Set enable secret (IOS)
       cisco.ios.ios_config:
         lines:
+          - "no enable secret"
+          - "no enable password"
           - "enable secret {{ enable_password }}"
         save_when: "changed"
