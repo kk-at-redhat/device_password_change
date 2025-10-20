@@ -17,8 +17,8 @@
         roles: ["network-admin"]
         configured_password: "{{ new_password }}"
 
-    - name: Set enable password (not commonly used in NXOS)
-      cisco.nxos.nxos_config:
-        lines:
-          - "password strength-check disable"
-          - "username {{ new_username }} password {{ enable_password }}"
+    - name: Change admin password (NXOS)
+      cisco.nxos.nxos_user:
+        name: "admin"
+        roles: ["network-admin"]
+        configured_password: "{{ enable_password }}"
