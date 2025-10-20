@@ -1,4 +1,5 @@
 ---
+# This hasn't been tested yet
 - name: Update usernames on Arista EOS devices
   hosts: all
   gather_facts: false
