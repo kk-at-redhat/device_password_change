@@ -3,3 +3,5 @@
 
 # NX-OS Software, Version 10.3(3)
 sbx-nxos-mgmt.cisco.com
+
+host1

@@ -1,0 +1,11 @@
+---
+- name: ERROR HANDLING - extract error message
+  ansible.builtin.set_fact:
+    command_error: "{{ command_result.msg }}"
+    command_stderr: "{{ command_result.module_stderr | default('')}}"
+  no_log: true
+
+- name: ERROR HANDLING - show error message
+  ansible.builtin.debug:
+    msg: "{{ command_desription }}{{ command_stderr | default(command_error, true) }}"
+  failed_when: true

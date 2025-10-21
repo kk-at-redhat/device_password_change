@@ -1,0 +1,25 @@
+- name: DETECT OS
+  ansible.builtin.import_playbook: 1.detect_os.yml
+
+- name: IOS
+  when: >
+        inventory_hostname != 'localhost' and
+        'ios' in detected_os
+  ansible.builtin.import_playbook: 2.update_users_ios.yml
+  vars:
+    ansible_network_os: "{{ detected_os | trim }}"
+
+- name: EOS
+  when: "'aos' in detected_os"
+  ansible.builtin.import_playbook: 2.update_users_eos.yml
+  vars:
+    ansible_network_os: "{{ detected_os | trim }}"
+
+- name: NXOS
+  when: "'nxos' in detected_os"
+  ansible.builtin.import_playbook: 2.update_users_nxos.yml
+  vars:
+    ansible_network_os: "{{ detected_os | trim }}"
+
+- name: REPORTING
+  ansible.builtin.import_playbook: 3.reporting.yml

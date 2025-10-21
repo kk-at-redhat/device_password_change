@@ -1,0 +1,33 @@
+---
+- name: DETECT OS
+  hosts: all, localhost
+  gather_facts: false
+  connection: ssh
+
+  tasks:
+    - name: DETECT OS
+      when: inventory_hostname != 'localhost'
+      block:
+        - name: DETECT OS - run show version
+          ansible.builtin.raw: show version
+          changed_when: false
+          register: show_version
+          check_mode: false
+
+        - name: DETECT OS - parse show version
+          ansible.builtin.set_fact:
+            detected_os: >
+              {% if 'NX-OS' in show_version.stdout %}
+                cisco.nxos.nxos
+              {% elif 'Arista' in show_version.stdout %}
+                arista.eos.eos
+              {% elif 'IOS' in show_version.stdout %}
+                cisco.ios.ios
+              {% else %}
+                unknown
+              {% endif %}
+
+        - name: DETECT OS - fail if unable to determine OS
+          when: detected_os | default('') | trim == 'unknown'
+          ansible.builtin.fail:
+            msg: "Unable to determine device OS"

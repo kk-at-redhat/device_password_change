@@ -1,0 +1,37 @@
+---
+- name: REPORTING
+  hosts: all, localhost
+  gather_facts: false
+
+  tasks:
+    - name: REPORTING - add hosts to reports
+      delegate_to: localhost
+      run_once: true
+      check_mode: false
+      block:
+        - name: REPORTING - add failed hosts to report
+          ansible.builtin.lineinfile:
+            path: "/tmp/hosts_failed.txt"
+            line: "{{ item }}"
+            create: true
+            mode: '666'
+          loop: "{{ ansible_play_hosts_all | difference(ansible_play_hosts) }}"
+
+        - name: REPORTING - add successfull hosts to report
+          when: item != 'localhost'
+          ansible.builtin.lineinfile:
+            path: "/tmp/hosts_success.txt"
+            line: "{{ item }}"
+            create: true
+            mode: '666'
+          loop: "{{ ansible_play_hosts }}"
+
+        # Replace with tasks that push results to a SNow ticket
+        - name: REPORTING - output reports
+          ansible.builtin.debug:
+            msg: "{{ (lookup('ansible.builtin.file', item, errors='ignore') | default(' ', true)).splitlines() }}"
+          loop:
+            - /tmp/hosts_failed.txt
+            - /tmp/hosts_success.txt
+          loop_control:
+            label: "{{ item }}"

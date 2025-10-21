@@ -1,0 +1,37 @@
+---
+# This hasn't been tested yet
+- name: EOS - update usernames on Arista EOS devices
+  hosts: all
+  gather_facts: false
+  connection: network_cli
+
+  tasks:
+    - name: EOS - remove old username
+      when: change_username | default(false)
+      arista.eos.eos_user:
+        name: "{{ current_username }}"
+        state: absent
+
+    - name: EOS - add new username
+      arista.eos.eos_user:
+        name: "{{ new_username }}"
+        privilege: 15
+        configured_password: "{{ new_password }}"
+
+    - name: EOS - attempt to set enable secret
+      block:
+        - name: EOS - set enable secret
+          arista.eos.eos_config:
+            lines:
+              - "enable secret {{ enable_password }}"
+            save_when: "changed"
+          no_log: true
+          register: eos_set_enable_password_result
+
+      rescue:
+        - name: EOS - extract and show error message
+          ansible.builtin.include_tasks:
+            file: x.handle_failure.yml
+          vars:
+            command_result: "{{ eos_set_enable_password_result }}"
+            command_desription: "Setting enable password on EOS failed with error: "

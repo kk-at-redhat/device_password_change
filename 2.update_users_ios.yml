@@ -1,0 +1,42 @@
+---
+- name: IOS - update users and enable password on Cisco IOS devices
+  hosts: all
+  gather_facts: false
+  connection: network_cli
+
+  tasks:
+    - name: IOS - remove old username
+      when: change_username | default(false)
+      cisco.ios.ios_user:
+        name: "{{ current_username }}"
+        state: absent
+
+    - name: IOS - add new username
+      cisco.ios.ios_user:
+        name: "{{ new_username }}"
+        privilege: 15
+        configured_password: "{{ new_password }}"
+#     As requested - example of using hashed password with specified encryption level
+#        hashed_password:
+#          type: 8
+#          value: "{{ new_password_hash }}"
+
+    - name: IOS - attempt to set enable secret
+      block:
+        - name: IOS - set enable secret
+          cisco.ios.ios_config:
+            lines:
+              - "no enable secret"
+              - "no enable password"
+              - "enable secret {{ enable_password }}"
+            save_when: "changed"
+          no_log: true
+          register: ios_set_enable_password_result
+
+      rescue:
+        - name: IOS - extract and show error message
+          ansible.builtin.include_tasks:
+            file: x.handle_failure.yml
+          vars:
+            command_result: "{{ ios_set_enable_password_result }}"
+            command_desription: "Setting enable password on IOS failed with error: "
