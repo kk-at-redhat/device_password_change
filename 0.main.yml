@@ -10,7 +10,7 @@
     ansible_network_os: "{{ detected_os | trim }}"
 
 - name: EOS
-  when: "'aos' in detected_os"
+  when: "'eos' in detected_os"
   ansible.builtin.import_playbook: 2.update_users_eos.yml
   vars:
     ansible_network_os: "{{ detected_os | trim }}"

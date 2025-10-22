@@ -1,9 +1,9 @@
 ---
-# This hasn't been tested yet
 - name: EOS - update usernames on Arista EOS devices
   hosts: all
   gather_facts: false
   connection: network_cli
+  become: true
 
   tasks:
     - name: EOS - remove old username
@@ -23,7 +23,7 @@
         - name: EOS - set enable secret
           arista.eos.eos_config:
             lines:
-              - "enable secret {{ enable_password }}"
+              - "enable password {{ enable_password }}"
             save_when: "changed"
           no_log: true
           register: eos_set_enable_password_result

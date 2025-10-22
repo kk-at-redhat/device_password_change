@@ -1,7 +1,11 @@
 # IOS XE Software, Version 17.12.02
 10.10.20.48
 
+# IOS XE Software, Version 17.14.01
+3.144.3.131
+
 # NX-OS Software, Version 10.3(3)
 sbx-nxos-mgmt.cisco.com
 
-host1
+# EOS 4.32.0F
+18.221.145.222
