@@ -6,7 +6,7 @@
   tasks:
     - name: REPORTING - add hosts to reports
       delegate_to: localhost
-      run_once: true
+      run_once: true # noqa: run-once[task]
       check_mode: false
       block:
         - name: REPORTING - add failed hosts to report
