@@ -2,14 +2,14 @@
 - name: DETECT OS
   hosts: all, localhost
   gather_facts: false
-  connection: ssh
+  connection: paramiko
 
   tasks:
     - name: DETECT OS
       when: inventory_hostname != 'localhost'
       block:
         - name: DETECT OS - run show version
-          ansible.builtin.raw: show version
+          ansible.builtin.raw: "show version"
           changed_when: false
           register: show_version
           check_mode: false
